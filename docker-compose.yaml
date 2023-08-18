@@ -2,7 +2,7 @@
 version: "3"
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.3.1
+    image: confluentinc/cp-zookeeper:7.2.6
     container_name: zookeeper
     networks:
        kafka:
@@ -19,7 +19,7 @@ services:
       - zk-txn-logs:/var/lib/zookeeper/log
     
   broker:
-    image: confluentinc/cp-enterprise-kafka:5.3.1
+    image: confluentinc/cp-enterprise-kafka:7.2.6
     container_name: broker
     networks:
        kafka:
@@ -46,7 +46,7 @@ services:
       KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      #KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker.local:19092
       CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper.local:22181
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
@@ -63,7 +63,7 @@ services:
       - ./secrets:/etc/kafka/secrets
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.3.1
+    image: confluentinc/cp-schema-registry:7.2.6
     depends_on:
       - zookeeper
       - broker
@@ -98,7 +98,7 @@ services:
       - ./secrets:/etc/kafka/secrets
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:5.3.1
+    image: confluentinc/cp-enterprise-control-center:7.2.6
     container_name: control-center
     networks:
        kafka:
@@ -135,16 +135,15 @@ services:
       CONTROL_CENTER_REST_SSL_KEYSTORE_PASSWORD: awesomekafka
       CONTROL_CENTER_REST_SSL_KEY_PASSWORD: awesomekafka
       CONTROL_CENTER_OPTS: -Djavax.net.ssl.trustStore=/etc/kafka/secrets/kafka.control-center.truststore.jks
-                  -Djavax.net.ssl.trustStorePassword=kafka
+                  -Djavax.net.ssl.trustStorePassword=awesomekafka
                   -Djavax.net.ssl.keyStore=/etc/kafka/secrets/kafka.control-center.keystore.jks
-                  -Djavax.net.ssl.keyStorePassword=kafka
+                  -Djavax.net.ssl.keyStorePassword=awesomekafka
       PORT: 9021
     volumes:
       - ./secrets:/etc/kafka/secrets
 
   kafka-tools:
-    build:
-      context: ./kafka-tools
+    image: confluentinc/cp-enterprise-kafka:7.2.6
     depends_on:
       - broker
     container_name: kafka-tools
@@ -167,7 +166,7 @@ services:
       - ./config:/etc/kafka/config
 
   rest-proxy:
-    image: confluentinc/cp-kafka-rest:5.3.1
+    image: confluentinc/cp-kafka-rest:7.2.6
     depends_on:
       - zookeeper
       - broker

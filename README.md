@@ -8,10 +8,6 @@ Also included:
 ### Initial set-up
 
 0. Ensure Docker and Docker Compose are installed
-1. Build the Docker containers.
-   ```sh
-     docker-compose build.
-   ```
 
 ### Starting up
 

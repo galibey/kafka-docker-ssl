@@ -44,4 +44,20 @@ for i in broker control-center metrics schema-registry kafka-tools rest-proxy; d
 	echo $PASSWORD >${i}_truststore_creds
 done
 
+# export public and private key for fluvio connector from keystore
+keytool -importkeystore \
+     -srckeystore kafka.kafka-tools.keystore.jks \
+     -destkeystore fluvio.kafka-tools.keystore.p12 \
+     -deststoretype PKCS12 \
+     -srcalias kafka-tools \
+     -srcstorepass $PASSWORD \
+     -storepass $PASSWORD \
+     -srckeypass $PASSWORD \
+     -keypass $PASSWORD 
+
+# public key
+openssl pkcs12 -in fluvio.kafka-tools.keystore.p12  -nokeys -out fluvio.pem -passin pass:$PASSWORD
+# private key
+openssl pkcs12 -in fluvio.kafka-tools.keystore.p12  -nodes -nocerts -out fluvio.key.pem -passin pass:$PASSWORD
+
 echo "✅  All done."
